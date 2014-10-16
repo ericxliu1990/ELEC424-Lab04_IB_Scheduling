@@ -180,16 +180,25 @@ g_pfnVectors:
 	.word	USART3_IRQHandler
 	.word	EXTI15_10_IRQHandler
 	.word	RTCAlarm_IRQHandler
-	.word	USBWakeUp_IRQHandler	
-  .word	0
-	.word	0
-	.word	0
-	.word	0
-	.word	0
-	.word	0
-	.word	0
-	.word	BootRAM          /* @0x108. This is for boot in RAM mode for 
-                            STM32F10x Medium Density devices. */
+	.word	USBWakeUp_IRQHandler//position 42	
+  	.word	0//43
+	.word	0//44
+	.word	0//45
+	.word	0//46
+	.word	0//47
+	.word	0//48
+	.word	0//49
+	.word	TIM5_IRQHandler//50
+	.word	0//51
+	.word	0//52
+	.word	0//53
+	.word	TIM6_IRQHandler//54
+	.word	TIM7_IRQHandler//55
+	.word	0//56
+	.word	0//57
+	.word	0//58
+	.word	0//59
+
    
 /*******************************************************************************
 *
@@ -354,5 +363,14 @@ g_pfnVectors:
 
 	.weak	USBWakeUp_IRQHandler
 	.thumb_set USBWakeUp_IRQHandler,Default_Handler
+
+	.weak	TIM5_IRQHandler
+	.thumb_set TIM4_IRQHandler,Default_Handler
+
+	.weak	TIM6_IRQHandler
+	.thumb_set TIM4_IRQHandler,Default_Handler
+
+	.weak	TIM7_IRQHandler
+	.thumb_set TIM4_IRQHandler,Default_Handler
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
