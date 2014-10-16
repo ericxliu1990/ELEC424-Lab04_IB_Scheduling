@@ -1,17 +1,40 @@
-/*
-A blinky file for Lab04-Interrupt Based Scheduling, ELEC424 Fall 2014
-Board: Bitcraze 's crazyfle
-Author: Xue Liu, Zichao Wang 
-Drive: STM32F10x_StdPeriph_Lib_V3.5.0
-*/
 
-/* Include files*/
+/**
+  ******************************************************************************
+  * @file    sys_clk_init.c
+  * @author  Xue Liu
+  * @version V0.1
+  * @date    08-15-2014
+  * @brief   Initialize the system clock by using external clock
+  ******************************************************************************
+  */
+
+
+/**
+  ******************************************************************************
+  * Include Files
+  ******************************************************************************
+  */
+  
 #include "sys_clk_init.h"
 
-/*Public functions*/
+/**
+  ******************************************************************************
+  * Private Functions Declaration
+  ******************************************************************************
+  */
+static void SetSysClockTo72_User(void);
 
-/*Private functions*/
+/**
+  ******************************************************************************
+  * Public Functions
+  ******************************************************************************
+  */
 
+/**
+ * @brief SystemInit_User
+ * @details Initalize the RCC clock system
+ */
 void SystemInit_User(void)
 {
 	  /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
@@ -39,6 +62,13 @@ void SystemInit_User(void)
   /* Vector Table Relocation in Internal FLASH. */
   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; 
 }
+
+
+/**
+  ******************************************************************************
+  * Private Functions
+  ******************************************************************************
+  */
 
 /**
   * @brief  Sets System clock frequency to 72MHz and configure HCLK, PCLK2 
@@ -118,3 +148,9 @@ static void SetSysClockTo72_User(void)
          configuration. User can add here some code to deal with this error */
   }
 }
+
+/**
+  ******************************************************************************
+  * End of the file
+  ******************************************************************************
+  */

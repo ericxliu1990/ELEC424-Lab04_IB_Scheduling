@@ -44,16 +44,16 @@
 // #include "stm32f10x_rtc.h"
 // #include "stm32f10x_sdio.h"
 // #include "stm32f10x_spi.h"
-// #include "stm32f10x_tim.h"
+#include "stm32f10x_tim.h"
 // #include "stm32f10x_usart.h"
 // #include "stm32f10x_wwdg.h"
-// #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
+#include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Uncomment the line below to expanse the "assert_param" macro in the 
    Standard Peripheral Library drivers code */
-/* #define USE_FULL_ASSERT    1 */
+// #define USE_FULL_ASSERT    1 
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
