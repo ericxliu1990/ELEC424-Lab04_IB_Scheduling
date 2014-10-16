@@ -30,6 +30,7 @@ void Motor_TIM_Configuration(TIM_TypeDef * TIM_GROUP,
                         	uint16_t CCR1_Pre, 
                         	uint16_t CCR2_Pre);
 void Timer_Configuration(TIM_TypeDef * TIM_GROUP);
+void NVIC_Configuration(void);
 /**
  * 
   ******************************************************************************
@@ -47,9 +48,10 @@ void main(void){
   LED_Init();
 
   /* TIM Configuration */
-  Motor_TIM_Configuration(TIM3, 5, 1);
-  Motor_TIM_Configuration(TIM4, 0, 10);
+  // Motor_TIM_Configuration(TIM3, 5, 1);
+  //Motor_TIM_Configuration(TIM4, 0, 10);
   NVIC_Configuration();
+  Timer_Configuration(TIM1);
   Timer_Configuration(TIM2);
   while (1)
   {}
@@ -68,9 +70,11 @@ void main(void){
 void RCC_Configuration(void)
 {
   /* Tim clocks of motors enable */
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 | RCC_APB1Periph_TIM4, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 | 
+  						 RCC_APB1Periph_TIM4 |
+  						 RCC_APB1Periph_TIM2, ENABLE);
   /* Tim clocks of general timer enable*/
-  RCC_APB1PeriphClockCmd(RCC_APB2Periph_TIM1 | RCC_APB1Periph_TIM2, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);
 
   /* GPIOB clock for motors and LEDs enable */
   RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
@@ -96,10 +100,17 @@ void NVIC_Configuration(void)
 {
 
        NVIC_InitTypeDef NVIC_InitStructure;
-       NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+       // NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+       /* enable TIM1 UP IRQ*/
+       NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;     
+       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+       NVIC_Init(&NVIC_InitStructure);
+       /* enable TIM2 */
        NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;     
        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
        NVIC_Init(&NVIC_InitStructure);
 
@@ -181,6 +192,7 @@ void Timer_Configuration(TIM_TypeDef * TIM_GROUP)
     TIM_TimeBaseStructure.TIM_Prescaler = (36000-1);
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM_GROUP, &TIM_TimeBaseStructure);
 
   	/* clear flag of the TIM Groupe*/
@@ -200,13 +212,15 @@ void Timer_Configuration(TIM_TypeDef * TIM_GROUP)
 void TIM2_IRQHandler(void){
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
 		TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
-		LED_Toggle();
+		
+		Motor_TIM_Configuration(TIM3, 5, 1);
 	}
 }
 
 void TIM1_UP_IRQHandler(void){
 	if(TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET){
 		TIM_ClearITPendingBit(TIM1 , TIM_FLAG_Update);
+		// Motor_TIM_Configuration(TIM3, 5, 1);
 		LED_Toggle();
 	}
 }
