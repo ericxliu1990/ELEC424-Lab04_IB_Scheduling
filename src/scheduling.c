@@ -18,6 +18,7 @@
 #include "stm32f10x.h"
 #include "blinky.h"
 #include "sys_clk_init.h"
+#include "lab04_tasks.h"
 /**
   ******************************************************************************
   * Private function declaration
@@ -29,7 +30,7 @@ void Motor_GPIO_Configuration(void);
 void Motor_TIM_Configuration(TIM_TypeDef * TIM_GROUP, 
                         	uint16_t CCR1_Pre, 
                         	uint16_t CCR2_Pre);
-void Timer_Configuration(TIM_TypeDef * TIM_GROUP);
+void Timer_Configuration(TIM_TypeDef * TIM_GROUP, uint16_t Period);
 void NVIC_Configuration(void);
 /**
  * 
@@ -51,10 +52,11 @@ void main(void){
   // Motor_TIM_Configuration(TIM3, 5, 1);
   //Motor_TIM_Configuration(TIM4, 0, 10);
   NVIC_Configuration();
-  Timer_Configuration(TIM1);
-  Timer_Configuration(TIM2);
-  while (1)
-  {}
+  Timer_Configuration(TIM1, 20);
+  Timer_Configuration(TIM2, 2000);
+  while (1){
+  	logDebugInfo();
+  }
 }
 /**
   ******************************************************************************
@@ -104,13 +106,13 @@ void NVIC_Configuration(void)
        /* enable TIM1 UP IRQ*/
        NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;     
        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
        NVIC_Init(&NVIC_InitStructure);
        /* enable TIM2 */
        NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;     
-       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
        NVIC_Init(&NVIC_InitStructure);
 
@@ -183,12 +185,12 @@ void Motor_TIM_Configuration(TIM_TypeDef * TIM_GROUP,
   TIM_Cmd(TIM_GROUP, ENABLE);
 }
 
-void Timer_Configuration(TIM_TypeDef * TIM_GROUP)  
+void Timer_Configuration(TIM_TypeDef * TIM_GROUP, uint16_t Period)
 {   
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_DeInit(TIM_GROUP);  
     /* Time base configuration */
-    TIM_TimeBaseStructure.TIM_Period = 2000-1;
+    TIM_TimeBaseStructure.TIM_Period = Period - 1;
     TIM_TimeBaseStructure.TIM_Prescaler = (36000-1);
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -209,18 +211,33 @@ void Timer_Configuration(TIM_TypeDef * TIM_GROUP)
   * ISR handlers
   ******************************************************************************
   */
-void TIM2_IRQHandler(void){
-	if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
-		TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
-		
-		Motor_TIM_Configuration(TIM3, 5, 1);
-	}
-}
+uint8_t TIM1_ISR_Counter = 0;
 
 void TIM1_UP_IRQHandler(void){
 	if(TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET){
 		TIM_ClearITPendingBit(TIM1 , TIM_FLAG_Update);
-		// Motor_TIM_Configuration(TIM3, 5, 1);
-		LED_Toggle();
+		/*call the the task 1 every 10ms*/
+		detectEmergency();
+		/* Use global counter to count and call task2 every 100 ms*/
+		TIM1_ISR_Counter++;
+		if(TIM1_ISR_Counter == 10){
+			refreshSensorData();
+			LED_Toggle();
+			TIM1_ISR_Counter = 0;
+		}
+	}
+}
+
+MotorSpeeds motor_speeds;
+void TIM2_IRQHandler(void){
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
+		TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
+		
+		calculateOrientation();
+		updatePid(&motor_speeds);
+		/* Motor 2 and Motor 1 configuration */
+		Motor_TIM_Configuration(TIM3, motor_speeds.m2 * 5, motor_speeds.m1 * 5);
+		/* Motor 4 and Motor 3 configuration */
+		Motor_TIM_Configuration(TIM4, motor_speeds.m4 * 5, motor_speeds.m3 * 5);
 	}
 }

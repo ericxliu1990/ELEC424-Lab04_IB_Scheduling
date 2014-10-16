@@ -16,6 +16,7 @@ CORE_LIB = $(STM_LIB)/CMSIS/CM3/CoreSupport
 PRO_SRC = $(PRO_ROOT)/src
 PRO_INC = $(PRO_ROOT)/inc
 PRO_BIN = $(PRO_ROOT)/bin
+PRO_LIB = $(PRO_ROOT)/lib
 PRO_LINK = $(PRO_ROOT)/linker_script
 
 #VPATH for searching files
@@ -29,6 +30,8 @@ PROCESSOR = -mcpu=cortex-m3 -mthumb
 
 # Directories of used header files
 INCLUDE = -I$(PRO_INC) -I$(DEV_LIB)/inc -I$(SYS_LIB) -I$(CORE_LIB)
+
+# Static Library
 
 # STM chip specific flags
 STFLAGS = -DSTM32F10X_MD -include $(PRO_ROOT)/stm32f10x_conf.h
@@ -44,6 +47,7 @@ OBJS = $(STARTUP_PATH)/startup_stm32f10x_md.s \
 	$(PRO_SRC)/scheduling.c \
 	$(PRO_SRC)/blinky.c\
 	$(PRO_SRC)/sys_clk_init.c\
+	$(PRO_LIB)/lab04_tasks.a\
 	$(DEV_LIB)/src/stm32f10x_rcc.c \
 	$(DEV_LIB)/src/stm32f10x_gpio.c \
 	$(DEV_LIB)/src/stm32f10x_tim.c \
@@ -55,7 +59,7 @@ ELF_FILE = $(PRO_BIN)/$(FILENAME).elf
 all: compile flash
 
 compile:
-	@$(CC) $(CFLAGS) $(OBJS) -o $(ELF_FILE)
+	@$(CC) $(CFLAGS) $(CLIBS) $(OBJS) -o $(ELF_FILE)
 
 # Program .elf into Crazyflie flash memory via the busblaster
 OCDFLAG =  -d0 -f interface/busblaster.cfg -f target/stm32f1x.cfg -c init -c targets -c "reset halt" 
