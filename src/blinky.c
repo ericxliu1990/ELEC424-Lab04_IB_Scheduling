@@ -1,58 +1,77 @@
-/*
-A blinky file for Lab03-Blinky, ELEC424 Fall 2014
-Board: Bitcraze 's crazyfle
-Author: Xue Liu, Zichao Wang 
-Drive: STM32F10x_StdPeriph_Lib_V3.5.0
+
+/**
+  ******************************************************************************
+  * @file    blinky.c
+  * @author  Xue Liu
+  * @version V0.1
+  * @date    08-16-2014
+  * @brief   Provides LED control functions
+  ******************************************************************************
+  */
+
+/**
+  ******************************************************************************
+  * Include Files
+  ******************************************************************************
+  */
+
+#include "blinky.h"
+/**
+  ******************************************************************************
+  * Private function declaration
+  ******************************************************************************
+  */
+
+/**
+*
+******************************************************************************
+* Private Global Variables
+******************************************************************************
 */
 
-/* Include files*/
-#include "blinky.h"
-#include "sys_clk_init.h"
+GPIO_TypeDef *LED_PORT[LEDn] = {
+    LED_RED_GPIO_PORT, LED_GREEN_GPIO_PORT,
+};
+const uint16_t LED_PIN[LEDn] = {LED_RED_PIN, LED_GREEN_PIN};
+const uint32_t LED_CLK[LEDn] = {LED_RED_GPIO_CLK, LED_GREEN_GPIO_CLK};
+/**
+  ******************************************************************************
+  * Public functions
+  ******************************************************************************
+  */
 
-/*Public functions*/
-
-/* Init a led 
+/* Init a led
 @param none
 @retval none
 */
-void LED_Init()
-{
-	GPIO_InitTypeDef  GPIO_InitStructure;
+void LED_Init(Led_TypeDef LED_NUM) {
+  GPIO_InitTypeDef GPIO_InitStructure;
 
-	/* Enable the GPIO_LED Clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+  /* Enable the GPIO_LED Clock */
+  RCC_APB2PeriphClockCmd(LED_CLK[LED_NUM], ENABLE);
 
-	/* Configure the GPIO_LED pin */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  /* Configure the GPIO_LED pin */
+  GPIO_InitStructure.GPIO_Pin = LED_PIN[LED_NUM];
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(LED_PORT[LED_NUM], &GPIO_InitStructure);
 }
 
 /* LED_On
-@brief turn the green led on 
+@brief turn the green led on
 @param none
 @retval none
 */
-void LED_On()
-{
-	GPIOB->BRR = GPIO_Pin_5;
-}
+void LED_On(Led_TypeDef LED_NUM) { GPIOB->BRR = LED_PIN[LED_NUM]; }
 /* LED_Off
 @brief turn the green off
 @param none
 @retval none
 */
-void LED_Off()
-{
-	GPIOB->BSRR = GPIO_Pin_5;  
-}
+void LED_Off(Led_TypeDef LED_NUM) { GPIOB->BSRR = LED_PIN[LED_NUM]; }
 /* LED_Toggle()
 @param none
 @retval none
 */
-void LED_Toggle()
-{
-	GPIOB->ODR ^= GPIO_Pin_5;
-}
+void LED_Toggle(Led_TypeDef LED_NUM) { GPIOB->ODR ^= LED_PIN[LED_NUM]; }

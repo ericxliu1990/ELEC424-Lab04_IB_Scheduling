@@ -36,7 +36,9 @@ void NVIC_Configuration(void);
   * Global Variables
   ******************************************************************************
   */
-uint8_t TIM1_ISR_Counter = 0;
+uint8_t TIM1_ISR_Counter1 = 0;
+uint8_t TIM1_ISR_Counter2 = 0;
+uint32_t TIM2_ISR_Counter = 0;
 MotorSpeeds motor_speeds;
 /**
  *
@@ -57,11 +59,10 @@ void main(void) {
 
   /* GPIO Configuration */
   Motor_GPIO_Configuration();
-  LED_Init();
+  LED_Init(LED_GREEN);
+  LED_Init(LED_RED);
 
   /* TIM Configuration */
-  // Motor_TIM_Configuration(TIM3, 5, 1);
-  // Motor_TIM_Configuration(TIM4, 0, 10);
   NVIC_Configuration();
   Timer_Configuration(TIM1, 20);
   Timer_Configuration(TIM2, 2000);
@@ -237,12 +238,19 @@ void TIM1_UP_IRQHandler(void) {
     /*call the the task 1 called every 10ms*/
     detectEmergency();
     /* Use global counter to count and called every 100 ms*/
-    TIM1_ISR_Counter++;
-    if (TIM1_ISR_Counter == 10) {
+    TIM1_ISR_Counter1++;
+    if (TIM1_ISR_Counter1 == 10) {
       /* Task2 called every 100 ms*/
       refreshSensorData();
-      LED_Toggle();
-      TIM1_ISR_Counter = 0;
+      
+      TIM1_ISR_Counter1 = 0;
+    }
+    TIM1_ISR_Counter2++;
+    if (TIM1_ISR_Counter2 == 50) {
+      /* Task2 called every 500 ms*/
+      LED_Toggle(LED_RED);
+
+      TIM1_ISR_Counter2 = 0;
     }
   }
 }
@@ -255,6 +263,17 @@ void TIM2_IRQHandler(void) {
   if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
     TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);
 
+    /* change mode after 10 secs */
+    TIM2_ISR_Counter++;
+    if(TIM2_ISR_Counter > 5 && TIM2_ISR_Counter < 25){
+      GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    }
+    if(TIM2_ISR_Counter > 25){
+      GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, DISABLE);
+    }
+
+    /* Toggle the LED every 1000ms */
+    LED_Toggle(LED_GREEN);
     /* Task3 called every 1000ms */
     calculateOrientation();
     /* Task 4 called every 1000ms */

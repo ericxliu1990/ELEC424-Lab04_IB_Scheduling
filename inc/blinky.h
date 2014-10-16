@@ -1,43 +1,37 @@
-/*
-the blinky header file for Lab03-Blinky, ELEC424 Fall 2014
-Board: Bitcraze 's crazyfle
-Author: Xue Liu, Zichao Wang 
-*/
 
-/* LED definations 
-#define LEDn                             2
+/**
+  ******************************************************************************
+  * @file    blinky.h
+  * @author  Xue Liu
+  * @version V0.1
+  * @date    08-16-2014
+  * @brief   Provides LED definations
+  ******************************************************************************
+  */
 
-#define LED_RED_PIN                               GPIO_Pin_4
-#define LED_RED_GPIO_PORT                 GPIOB
-#define LED_RED_GPIO_CLK                    RCC_APB2Periph_GPIOB
+/**
+  ******************************************************************************
+  * Definations
+  ******************************************************************************
+  */
+
+#define LEDn 2
+
+#define LED_RED_PIN GPIO_Pin_4
+#define LED_RED_GPIO_PORT GPIOB
+#define LED_RED_GPIO_CLK RCC_APB2Periph_GPIOB
+
+#define LED_GREEN_PIN GPIO_Pin_5
+#define LED_GREEN_GPIO_PORT GPIOB
+#define LED_GREEN_GPIO_CLK RCC_APB2Periph_GPIOB
   
-#define LED_GREEN_PIN                         GPIO_Pin_5
-#define LED_GREEN_GPIO_PORT           GPIOB
-#define LED_GREEN_GPIO_CLK              RCC_APB2Periph_GPIOB  
-          
-typedef enum 
-{
-	LED_RED = 0,
-	LED_GREEN = 1
-} Led_TypeDef;
-
-GPIO_TypeDef* LED_PORT[LEDn] = {LED_RED_GPIO_PORT, LED_GREEN_GPIO_PORT,};
-const uint16_t LED_PIN[LEDn] = {LED_RED_PIN, LED_GREEN_PIN};
-const uint32_t LED_CLK[LEDn] = {LED_RED_GPIO_CLK, LED_GREEN_GPIO_CLK};
-*/
-
-/* Delay*/
-#ifndef PROCISE_DELAY
-	#define _delay_ Delay
-#else
-	#define _delay_ delay 
-#endif
-
-/* Public functions*/
-void LED_Init();
-void LED_On();
-void LED_Off();
-void LED_Toggle();
-static void delay(__IO uint32_t nCount);
-void Delay(__IO uint32_t nTime);
-void Delay_Handler(void);
+typedef enum { LED_RED = 0, LED_GREEN = 1 } Led_TypeDef;
+/**
+  ******************************************************************************
+  * Public Functions
+  ******************************************************************************
+  */
+void LED_On(Led_TypeDef LED_NUM);
+void LED_Off(Led_TypeDef LED_NUM);
+void LED_Toggle(Led_TypeDef LED_NUM);
+void LED_Toggle(Led_TypeDef LED_NUM);
