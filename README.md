@@ -10,3 +10,6 @@ The lab04_tasks.h shows details about the tasks, their priorities (the smaller t
 To test your scheduling algorithm, we can use the function updatePid(), which will check if the time constraints are met. If the scheduler is successful, this function will return a struct with on-off settings for each motor. It will then turn on (i.e. rotate at a safe speed) the appropriate motors according to the returned struct immediately after updatePid() returns. If all tasks have been correctly scheduled, the motors will spin in a recognizable pattern; otherwise the motors will not spin.
 
 Last, but not least, the firmware additionally flash the green LED at 1 Hz and the red LED at 0.5 Hz.
+
+Here is the video of the running program on Crazyflie.
+https://www.youtube.com/watch?v=ccPVkRPeqDo

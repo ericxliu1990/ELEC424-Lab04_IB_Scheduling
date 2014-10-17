@@ -115,7 +115,7 @@ void Motor_GPIO_Configuration(void) {
 void NVIC_Configuration(void) {
 
   NVIC_InitTypeDef NVIC_InitStructure;
-  // NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
   /* enable TIM1 UP IRQ*/
   NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -277,10 +277,12 @@ void TIM2_IRQHandler(void) {
     /* Task3 called every 1000ms */
     calculateOrientation();
     /* Task 4 called every 1000ms */
+
     updatePid(&motor_speeds);
     /* Motor 2 and Motor 1 configuration */
     Motor_TIM_Configuration(TIM3, motor_speeds.m2 * 5, motor_speeds.m1 * 5);
     /* Motor 4 and Motor 3 configuration */
     Motor_TIM_Configuration(TIM4, motor_speeds.m4 * 5, motor_speeds.m3 * 5);
+
   }
 }
